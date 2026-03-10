@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScriptForge AI — AI Tools for FiveM & Discord Developers</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060810;--bg2:#0a0d16;--bg3:#0f1320;--border:#1a2235;--border2:#243050;--cyan:#00e5ff;--cyan2:#00b8d9;--green:#00ff9d;--purple:#7c3aed;--purple2:#a78bfa;--red:#ff3b5c;--orange:#ff8c00;--gold:#ffd700;--text:#e8edf5;--text2:#6b7fa3;--text3:#3a4a65;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:"JetBrains Mono",monospace;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0;}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;animation:orbFloat 8s ease-in-out infinite;}
+.orb1{width:600px;height:600px;background:rgba(0,229,255,0.04);top:-200px;left:-200px;}
+.orb2{width:500px;height:500px;background:rgba(124,58,237,0.05);bottom:-100px;right:-100px;animation-delay:4s;}
+@keyframes orbFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-30px);}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:64px;background:rgba(6,8,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 40px;gap:16px;z-index:100;}
+nav::after{content:"";position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,0.3),transparent);}
+.nav-brand{display:flex;align-items:center;gap:12px;margin-right:auto;text-decoration:none;cursor:pointer;}
+.nav-brand img{width:38px;height:38px;border-radius:9px;object-fit:cover;box-shadow:0 0 14px rgba(0,229,255,0.25);}
+.nav-logo-text{font-family:"Syne",sans-serif;font-size:18px;font-weight:900;letter-spacing:-0.5px;color:var(--text);}
+.nav-logo-text span{color:var(--cyan);text-shadow:0 0 20px rgba(0,229,255,0.5);}
+.nav-logo-sub{font-size:9px;color:var(--text3);letter-spacing:1.5px;}
+.nav-links{display:flex;gap:24px;}
+.nav-links a{font-size:11px;color:var(--text2);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--cyan);}
+.btn-nav-ghost{padding:8px 18px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);font-family:"JetBrains Mono",monospace;font-size:11px;cursor:pointer;transition:all .2s;}
+.btn-nav-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn-nav-primary{padding:8px 20px;border:none;border-radius:6px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#000;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-nav-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,229,255,0.35);}
+.btn-nav-download{padding:8px 18px;border:1px solid rgba(0,255,157,0.4);border-radius:6px;background:rgba(0,255,157,0.07);color:var(--green);font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-nav-download:hover{background:rgba(0,255,157,0.14);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,255,157,0.2);}
+.btn-nav-discord{padding:8px 18px;border:none;border-radius:6px;background:#5865F2;color:#fff;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-nav-discord:hover{background:#4752c4;transform:translateY(-1px);}
+.nav-user{display:none;align-items:center;gap:10px;}
+.nav-user.active{display:flex;}
+.nav-avatar{width:32px;height:32px;border-radius:50%;border:2px solid var(--cyan);object-fit:cover;}
+.nav-username{font-size:11px;color:var(--text);font-weight:700;}
+.nav-plan-badge{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(0,229,255,0.1);color:var(--cyan);border:1px solid rgba(0,229,255,0.2);}
+
+section{position:relative;z-index:1;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 48px 80px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border:1px solid rgba(0,229,255,0.2);border-radius:20px;background:rgba(0,229,255,0.05);font-size:11px;color:var(--cyan);margin-bottom:24px;animation:fadeDown .6s ease both;}
+.hero-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.hero-logo{animation:fadeUp .6s .05s ease both;margin-bottom:16px;}
+.hero-logo img{width:110px;height:110px;border-radius:22px;object-fit:cover;box-shadow:0 0 60px rgba(0,229,255,0.35),0 24px 48px rgba(0,0,0,0.6);}
+.hero h1{font-family:"Syne",sans-serif;font-size:clamp(40px,6vw,80px);font-weight:900;line-height:1.05;letter-spacing:-2px;max-width:900px;margin-bottom:24px;animation:fadeUp .7s .1s ease both;}
+.hero h1 .cyan{color:var(--cyan);text-shadow:0 0 40px rgba(0,229,255,0.3);}
+.hero h1 .dim{color:var(--text2);}
+.hero-sub{font-size:14px;color:var(--text2);max-width:560px;line-height:1.8;margin-bottom:40px;animation:fadeUp .7s .2s ease both;}
+.hero-btns{display:flex;gap:14px;margin-bottom:40px;animation:fadeUp .7s .3s ease both;flex-wrap:wrap;justify-content:center;}
+.btn-primary-lg{padding:14px 32px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--cyan),#0088bb);color:#000;font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary-lg:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,.4);}
+.btn-ghost-lg{padding:14px 32px;border:1px solid var(--border2);border-radius:8px;background:transparent;color:var(--text2);font-family:"JetBrains Mono",monospace;font-size:13px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-ghost-lg:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px);}
+.btn-download-lg{padding:14px 32px;border:2px solid var(--green);border-radius:8px;background:linear-gradient(135deg,rgba(0,255,157,.12),rgba(0,255,157,.05));color:var(--green);font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-download-lg:hover{background:rgba(0,255,157,.2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,255,157,.25);}
+.btn-discord-lg{padding:14px 32px;border:none;border-radius:8px;background:#5865F2;color:#fff;font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:10px;}
+.btn-discord-lg:hover{background:#4752c4;transform:translateY(-2px);box-shadow:0 8px 30px rgba(88,101,242,.4);}
+
+.discord-required-notice{display:flex;align-items:center;gap:10px;padding:12px 20px;border:1px solid rgba(88,101,242,0.3);border-radius:8px;background:rgba(88,101,242,0.06);font-size:11px;color:#a5b4fc;margin-bottom:28px;animation:fadeUp .7s .35s ease both;}
+
+.download-banner{width:100%;max-width:720px;margin-top:20px;background:linear-gradient(135deg,rgba(0,255,157,.06),rgba(0,229,255,.04));border:1px solid rgba(0,255,157,.2);border-radius:12px;padding:18px 28px;display:flex;align-items:center;gap:16px;animation:fadeUp .8s .5s ease both;}
+.dl-icon{font-size:32px;}.dl-info{text-align:left;flex:1;}
+.dl-title{font-family:"Syne",sans-serif;font-size:15px;font-weight:800;color:var(--green);margin-bottom:4px;}
+.dl-meta{font-size:10px;color:var(--text3);}
+.dl-btn{padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--green),#00cc7a);color:#000;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s;text-decoration:none;white-space:nowrap;}
+.dl-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,255,157,.35);}
+
+.hero-terminal{width:100%;max-width:720px;background:#060810;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(0,229,255,.08),0 40px 80px rgba(0,0,0,.6);animation:fadeUp .8s .4s ease both;}
+.term-bar{background:var(--bg3);padding:12px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border);}
+.td{width:11px;height:11px;border-radius:50%;}.td1{background:#ff5f57;}.td2{background:#febc2e;}.td3{background:#28c840;}
+.term-title{font-size:11px;color:var(--text3);margin-left:10px;}.term-ai{margin-left:auto;font-size:10px;color:var(--cyan);}
+.term-body{padding:20px 24px;text-align:left;font-size:12px;line-height:2;}
+.tc{color:var(--text3);}.tp{color:var(--cyan);}.tg{color:var(--green);}.ty{color:#ffd700;}.tw{color:var(--text2);}.tr{color:var(--red);}
+.typing{border-right:2px solid var(--cyan);animation:blink .8s step-end infinite;}
+@keyframes blink{50%{border-color:transparent;}}
+
+.stats-bar{padding:32px 48px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;justify-content:center;background:rgba(10,13,22,.8);}
+.stat-item{text-align:center;padding:0 48px;border-right:1px solid var(--border);}.stat-item:last-child{border-right:none;}
+.stat-num{font-family:"Syne",sans-serif;font-size:32px;font-weight:900;color:var(--cyan);}
+.stat-lbl{font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+
+/* SECTIONS */
+.tools-section,.how-section,.plans-section,.ai-section,.security-section{padding:100px 48px;max-width:1200px;margin:0 auto;}
+.section-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px;}
+.section-title{font-family:"Syne",sans-serif;font-size:clamp(28px,4vw,48px);font-weight:900;letter-spacing:-1px;margin-bottom:12px;line-height:1.1;}
+.section-sub{font-size:13px;color:var(--text2);max-width:500px;line-height:1.7;margin-bottom:56px;}
+
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden;}
+.tool-card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,.03),transparent);opacity:0;transition:opacity .3s;}
+.tool-card:hover{border-color:rgba(0,229,255,.25);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.4);}
+.tool-card:hover::before{opacity:1;}
+.tool-card.featured{grid-column:span 2;background:linear-gradient(135deg,rgba(0,229,255,.04),rgba(124,58,237,.04));border-color:rgba(0,229,255,.15);}
+.tool-icon{font-size:28px;margin-bottom:16px;display:block;}
+.tool-name{font-family:"Syne",sans-serif;font-size:17px;font-weight:800;margin-bottom:8px;}
+.tool-desc{font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px;}
+.tool-tag{display:inline-flex;align-items:center;font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text3);}
+.tool-tag.hot{border-color:rgba(0,229,255,.3);color:var(--cyan);background:rgba(0,229,255,.05);}
+.tool-tag.new{border-color:rgba(0,255,157,.3);color:var(--green);background:rgba(0,255,157,.05);}
+.tool-tag.pro{border-color:rgba(124,58,237,.3);color:var(--purple2);background:rgba(124,58,237,.05);}
+
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;position:relative;}
+.steps-grid::before{content:"";position:absolute;top:28px;left:12.5%;right:12.5%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),var(--border2),transparent);}
+.step{text-align:center;padding:0 24px;}
+.step-num{width:56px;height:56px;border-radius:50%;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:"Syne",sans-serif;font-size:18px;font-weight:900;color:var(--cyan);margin:0 auto 20px;position:relative;z-index:1;}
+.step-title{font-weight:700;font-size:13px;margin-bottom:8px;}.step-desc{font-size:11px;color:var(--text2);line-height:1.7;}
+
+/* PLANS */
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.plans-grid-lifetime{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;}
+.plans-toggle{display:flex;gap:0;margin-bottom:48px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;width:fit-content;}
+.plans-toggle button{padding:10px 28px;background:transparent;border:none;color:var(--text2);font-family:"JetBrains Mono",monospace;font-size:11px;cursor:pointer;transition:all .2s;}
+.plans-toggle button.active{background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(0,229,255,.05));color:var(--cyan);}
+.plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative;overflow:hidden;transition:all .3s;}
+.plan-card:hover{transform:translateY(-6px);border-color:var(--border2);}
+.plan-card.hot{border-color:rgba(0,229,255,.25);background:linear-gradient(160deg,rgba(0,229,255,.04),rgba(124,58,237,.04));}
+.plan-card.hot::before{content:"MOST POPULAR";position:absolute;top:0;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--cyan),var(--cyan2));color:#000;font-size:9px;font-weight:800;letter-spacing:1.5px;padding:4px 16px;border-radius:0 0 8px 8px;}
+.plan-card.lifetime{border-color:rgba(255,215,0,.25);background:linear-gradient(160deg,rgba(255,215,0,.04),rgba(255,140,0,.04));}
+.plan-card.lifetime::before{content:"♾️ LIFETIME";position:absolute;top:0;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--gold),var(--orange));color:#000;font-size:9px;font-weight:800;letter-spacing:1.5px;padding:4px 16px;border-radius:0 0 8px 8px;}
+.plan-card.ultimate{border-color:rgba(124,58,237,.4);background:linear-gradient(160deg,rgba(124,58,237,.08),rgba(167,139,250,.04));}
+.plan-card.ultimate::before{content:"💎 ULTIMATE";position:absolute;top:0;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#7c3aed,#a78bfa);color:#fff;font-size:9px;font-weight:800;letter-spacing:1.5px;padding:4px 16px;border-radius:0 0 8px 8px;}
+.plan-type{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;margin-top:8px;}
+.plan-name{font-family:"Syne",sans-serif;font-size:20px;font-weight:900;margin-bottom:6px;}
+.plan-price{font-family:"Syne",sans-serif;font-size:38px;font-weight:900;margin:18px 0 6px;}
+.plan-price.free{color:var(--green);}.plan-price.paid{color:var(--cyan);}.plan-price.devpro{color:var(--purple2);}.plan-price.gold{color:var(--gold);}
+.plan-price span{font-size:13px;color:var(--text2);font-weight:400;}
+.plan-tagline{font-size:11px;color:var(--text2);margin-bottom:24px;line-height:1.6;}
+.plan-features{list-style:none;margin-bottom:28px;}
+.plan-features li{font-size:11px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.plan-features li:last-child{border-bottom:none;}
+.plan-features li.yes::before{content:"✓";color:var(--green);font-weight:700;}
+.plan-features li.no{color:var(--text3);}.plan-features li.no::before{content:"×";color:var(--text3);}
+.plan-btn{width:100%;padding:12px;border-radius:8px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:800;cursor:pointer;transition:all .2s;border:none;text-transform:uppercase;}
+.plan-btn.free-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.plan-btn.free-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.plan-btn.paid-btn{background:linear-gradient(135deg,var(--cyan),#0077aa);color:#000;}
+.plan-btn.paid-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,255,.35);}
+.plan-btn.devpro-btn{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;}
+.plan-btn.devpro-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.35);}
+.plan-btn.gold-btn{background:linear-gradient(135deg,var(--gold),var(--orange));color:#000;}
+.plan-btn.gold-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.35);}
+.plan-btn.ultimate-btn{background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;}
+.plan-btn.ultimate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.45);}
+
+/* DASHBOARD */
+.dashboard-section{padding:80px 48px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(88,101,242,0.04),rgba(0,229,255,0.03));}
+.dashboard-inner{max-width:1200px;margin:0 auto;}
+.dashboard-preview{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-top:48px;}
+.dash-topbar{background:var(--bg3);padding:16px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.dash-dots{display:flex;gap:6px;}.dash-dot{width:10px;height:10px;border-radius:50%;}
+.dash-url{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 12px;font-size:10px;color:var(--text3);margin:0 20px;}
+.dash-content{padding:32px;}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px;}
+.dash-welcome{font-family:"Syne",sans-serif;font-size:22px;font-weight:900;}
+.dash-welcome span{color:var(--cyan);}
+.dash-welcome-sub{font-size:11px;color:var(--text2);margin-top:4px;}
+.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.dash-card-label{font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.dash-card-val{font-family:"Syne",sans-serif;font-size:22px;font-weight:900;color:var(--cyan);}
+.dash-card-sub{font-size:9px;color:var(--text3);margin-top:4px;}
+.dash-plan-block{background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(124,58,237,.04));border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.dash-plan-info{flex:1;}
+.dash-plan-name{font-family:"Syne",sans-serif;font-size:18px;font-weight:900;color:var(--cyan);}
+.dash-plan-meta{font-size:11px;color:var(--text2);margin-top:4px;}
+.dash-plan-bar{flex:1;max-width:200px;}
+.dash-bar-label{font-size:9px;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;}
+.dash-bar-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.dash-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:2px;}
+.dash-plan-btns{display:flex;gap:8px;}
+.dash-btn-cancel{padding:8px 16px;border:1px solid rgba(255,59,92,.3);border-radius:6px;background:transparent;color:var(--red);font-family:"JetBrains Mono",monospace;font-size:10px;cursor:pointer;transition:all .2s;}
+.dash-btn-cancel:hover{background:rgba(255,59,92,.1);}
+.dash-btn-renew{padding:8px 16px;border:none;border-radius:6px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#000;font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;}
+.dash-btn-renew:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,229,255,.3);}
+.dash-discord-lock{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:60px 32px;text-align:center;}
+.dash-lock-icon{font-size:48px;opacity:.5;}
+.dash-lock-title{font-family:"Syne",sans-serif;font-size:20px;font-weight:900;color:var(--text2);}
+.dash-lock-sub{font-size:12px;color:var(--text3);max-width:360px;line-height:1.7;}
+
+.payment-section{padding:80px 48px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(10,13,22,.6);text-align:center;}
+.payment-methods{display:flex;justify-content:center;align-items:center;gap:20px;margin-top:32px;flex-wrap:wrap;}
+.pay-card{display:flex;align-items:center;gap:10px;padding:14px 24px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text2);transition:all .2s;}
+.cashapp-highlight{display:flex;align-items:center;gap:12px;padding:14px 24px;background:linear-gradient(135deg,rgba(0,200,80,.1),rgba(0,200,80,.05));border:1px solid rgba(0,200,80,.3);border-radius:10px;font-size:13px;color:#00C85B;transition:all .2s;font-weight:700;cursor:pointer;}
+.cashapp-highlight:hover{background:rgba(0,200,80,.15);transform:translateY(-2px);}
+
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px;}
+.ai-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;transition:all .3s;position:relative;}
+.ai-card:hover{border-color:var(--border2);transform:translateY(-3px);}
+.ai-rank{position:absolute;top:16px;right:16px;font-size:10px;padding:3px 8px;border-radius:4px;font-weight:700;}
+.rank-1{background:rgba(255,215,0,.15);color:#ffd700;}.rank-2{background:rgba(192,192,192,.15);color:#c0c0c0;}.rank-3{background:rgba(0,229,255,.1);color:var(--cyan);}
+.ai-logo{font-size:32px;margin-bottom:12px;}.ai-name{font-family:"Syne",sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;}
+.ai-tag{font-size:10px;color:var(--cyan);margin-bottom:10px;}.ai-desc{font-size:11px;color:var(--text2);line-height:1.7;}
+
+.security-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px;}
+.sec-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;transition:all .2s;}
+.sec-card:hover{border-color:rgba(0,229,255,.2);}
+.sec-icon{font-size:26px;margin-bottom:14px;}.sec-title{font-size:14px;font-weight:700;margin-bottom:8px;}.sec-desc{font-size:11px;color:var(--text2);line-height:1.7;}
+
+.cta-section{padding:120px 48px;text-align:center;position:relative;}
+.cta-section::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,229,255,.04) 0%,transparent 60%);pointer-events:none;}
+.cta-section h2{font-family:"Syne",sans-serif;font-size:clamp(32px,5vw,64px);font-weight:900;letter-spacing:-1.5px;margin-bottom:16px;}
+.cta-section h2 span{color:var(--cyan);}
+.cta-sub{font-size:13px;color:var(--text2);margin-bottom:40px;}
+
+footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:rgba(6,8,16,.9);}
+.footer-brand{display:flex;align-items:center;gap:10px;}
+.footer-brand img{width:28px;height:28px;border-radius:6px;object-fit:cover;}
+.footer-logo{font-family:"Syne",sans-serif;font-size:16px;font-weight:900;}.footer-logo span{color:var(--cyan);}
+.footer-links{display:flex;gap:24px;}.footer-links a{font-size:11px;color:var(--text3);text-decoration:none;transition:color .2s;}.footer-links a:hover{color:var(--cyan);}
+.footer-copy{font-size:10px;color:var(--text3);}
+
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s ease;}.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:36px;width:460px;max-width:90vw;position:relative;animation:modalIn .25s ease;}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-close{position:absolute;top:14px;right:18px;font-size:20px;color:var(--text3);cursor:pointer;background:none;border:none;transition:color .2s;}
+.modal-close:hover{color:var(--text);}
+.modal-logo{text-align:center;margin-bottom:16px;}
+.modal-logo img{width:64px;height:64px;border-radius:14px;object-fit:cover;box-shadow:0 0 24px rgba(0,229,255,.25);}
+.modal-title{font-family:"Syne",sans-serif;font-size:22px;font-weight:900;margin-bottom:6px;text-align:center;}
+.modal-sub{font-size:11px;color:var(--text2);margin-bottom:24px;text-align:center;}
+.discord-login-btn{width:100%;padding:14px;border-radius:8px;border:none;background:#5865F2;color:#fff;font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;transition:all .2s;}
+.discord-login-btn:hover{background:#4752c4;transform:translateY(-1px);box-shadow:0 6px 20px rgba(88,101,242,.4);}
+.discord-required-note{font-size:10px;color:var(--text3);text-align:center;line-height:1.6;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);}
+.warning-note{font-size:10px;color:var(--orange);background:rgba(255,140,0,.07);border:1px solid rgba(255,140,0,.2);border-radius:6px;padding:10px 14px;line-height:1.6;margin-bottom:12px;}
+.cashapp-pay-block{width:100%;padding:18px;background:linear-gradient(135deg,rgba(0,200,80,.1),rgba(0,200,80,.05));border:1px solid rgba(0,200,80,.3);border-radius:10px;display:flex;align-items:center;gap:14px;cursor:pointer;margin-bottom:12px;transition:all .2s;}
+.cashapp-pay-block:hover{background:rgba(0,200,80,.15);}
+.cashapp-tag-display{font-size:15px;font-weight:800;color:#00C85B;}
+.cashapp-note{font-size:10px;color:var(--text3);margin-top:2px;}
+.pay-option{width:100%;padding:14px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;}
+.pay-option:hover{border-color:var(--border2);}
+
+/* SUB MODAL */
+.sub-detail{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.sub-detail:last-child{border-bottom:none;}
+.sub-detail-label{color:var(--text2);}
+.sub-detail-value{color:var(--text);font-weight:700;}
+.sub-detail-value.active{color:var(--green);}
+.sub-detail-value.warning{color:var(--orange);}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px;transition:width .5s ease;}
+
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:rgba(6,8,16,.95);z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.loading-overlay.show{display:flex;}
+.loading-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:13px;color:var(--text2);}
+
+/* SUPPORT FAB */
+.support-fab{position:fixed;bottom:28px;right:28px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.support-menu{display:flex;flex-direction:column;gap:6px;opacity:0;pointer-events:none;transform:translateY(8px);transition:all .2s;}
+.support-menu.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.support-option{padding:10px 18px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.support-option:hover{border-color:var(--cyan);color:var(--cyan);}
+.support-main{padding:12px 20px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#000;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,229,255,.3);transition:all .2s;}
+.support-main:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,.4);}
+
+.toast{position:fixed;bottom:90px;right:28px;padding:12px 20px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;font-size:12px;opacity:0;transform:translateY(10px);transition:all .3s;z-index:600;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Connecting to Discord...</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <img src="https://cdn.discordapp.com/attachments/1432861226232447016/1480394204457734144/Gemini_Generated_Image_5ipt7a5ipt7a5ipt-removebg-preview.png?ex=69af840a&is=69ae328a&hm=4bdddd9f1db051af2696e0cfd7faa145d74af571ed0f9edd413228eb21126849&" alt="ScriptForge AI">
+    <div>
+      <div class="nav-logo-text">Script<span>Forge</span> AI</div>
+      <div class="nav-logo-sub">by Burlau Devs</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#tools">Tools</a>
+    <a href="#plans">Plans</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#security">Security</a>
+  </div>
+  <!-- NOT LOGGED IN -->
+  <div id="navGuest" style="display:flex;gap:10px;align-items:center">
+    <a class="btn-nav-download" href="https://drive.google.com/uc?export=download&id=1sCb0_Z-jUw2ccXOgy5oySD-mPLmZJCxr">⬇️ Download</a>
+    <button class="btn-nav-discord" onclick="loginWithDiscord()">
+      <svg width="16" height="13" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a41 41 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.3 0A38.3 38.3 0 0 0 25.5.4 58.4 58.4 0 0 0 10.8 5C1.6 18.5-.9 31.7.3 44.7a58.9 58.9 0 0 0 18 9.1 44.5 44.5 0 0 0 3.8-6.2l-.1-.1a38.8 38.8 0 0 1-6-2.9l1-.7c11.5 5.3 24 5.3 35.3 0l1 .7a38.8 38.8 0 0 1-6 2.9c1.1 2.2 2.4 4.3 3.8 6.2a58.8 58.8 0 0 0 18-9.1C71 29.7 67.3 16.6 60.1 4.9ZM23.7 36.9c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/></svg>
+      Login with Discord
+    </button>
+  </div>
+  <!-- LOGGED IN -->
+  <div class="nav-user" id="navUser">
+    <img class="nav-avatar" id="navAvatar" src="" alt="">
+    <span class="nav-username" id="navUsername"></span>
+    <span class="nav-plan-badge" id="navPlanBadge">No Plan</span>
+    <button class="btn-nav-ghost" onclick="openModal('subModal')">My Plan</button>
+    <button class="btn-nav-ghost" onclick="doLogout()" style="color:var(--red);border-color:rgba(255,59,92,.3)">Logout</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">⚡ v2.0 — Now with Gemini · Claude · GPT-4o</div>
+  <div class="hero-logo">
+    <img src="https://cdn.discordapp.com/attachments/1432861226232447016/1480394204457734144/Gemini_Generated_Image_5ipt7a5ipt7a5ipt-removebg-preview.png?ex=69af840a&is=69ae328a&hm=4bdddd9f1db051af2696e0cfd7faa145d74af571ed0f9edd413228eb21126849&" alt="ScriptForge AI">
+  </div>
+  <h1>AI Tools for <span class="cyan">FiveM</span> &<br><span class="dim">Discord</span> Developers</h1>
+  <p class="hero-sub">Generate scripts, analyze code, detect exploits, and build Discord bots — all powered by Claude, GPT-4o & Gemini. One app. Infinite possibilities.</p>
+
+  <div class="discord-required-notice" id="heroDiscordNotice">
+    <svg width="16" height="16" viewBox="0 0 71 55" fill="#a5b4fc"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a41 41 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.3 0A38.3 38.3 0 0 0 25.5.4 58.4 58.4 0 0 0 10.8 5C1.6 18.5-.9 31.7.3 44.7a58.9 58.9 0 0 0 18 9.1 44.5 44.5 0 0 0 3.8-6.2l-.1-.1a38.8 38.8 0 0 1-6-2.9l1-.7c11.5 5.3 24 5.3 35.3 0l1 .7a38.8 38.8 0 0 1-6 2.9c1.1 2.2 2.4 4.3 3.8 6.2a58.8 58.8 0 0 0 18-9.1C71 29.7 67.3 16.6 60.1 4.9ZM23.7 36.9c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/></svg>
+    Discord login required to purchase or access your dashboard
+  </div>
+
+  <div class="hero-btns" id="heroBtnsGuest">
+    <button class="btn-discord-lg" onclick="loginWithDiscord()">
+      <svg width="20" height="16" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a41 41 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.3 0A38.3 38.3 0 0 0 25.5.4 58.4 58.4 0 0 0 10.8 5C1.6 18.5-.9 31.7.3 44.7a58.9 58.9 0 0 0 18 9.1 44.5 44.5 0 0 0 3.8-6.2l-.1-.1a38.8 38.8 0 0 1-6-2.9l1-.7c11.5 5.3 24 5.3 35.3 0l1 .7a38.8 38.8 0 0 1-6 2.9c1.1 2.2 2.4 4.3 3.8 6.2a58.8 58.8 0 0 0 18-9.1C71 29.7 67.3 16.6 60.1 4.9ZM23.7 36.9c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/></svg>
+      Login with Discord
+    </button>
+    <a class="btn-download-lg" href="https://drive.google.com/uc?export=download&id=1sCb0_Z-jUw2ccXOgy5oySD-mPLmZJCxr">⬇️ Download App</a>
+    <a class="btn-ghost-lg" href="#plans">View Plans →</a>
+  </div>
+  <div class="hero-btns" id="heroBtnsUser" style="display:none">
+    <a class="btn-download-lg" href="https://drive.google.com/uc?export=download&id=1sCb0_Z-jUw2ccXOgy5oySD-mPLmZJCxr">⬇️ Download App</a>
+    <button class="btn-primary-lg" onclick="openModal('subModal')">📊 My Dashboard →</button>
+    <a class="btn-ghost-lg" href="#plans">Upgrade Plan</a>
+  </div>
+
+  <div class="download-banner">
+    <div class="dl-icon">🖥️</div>
+    <div class="dl-info">
+      <div class="dl-title">ScriptForge AI v2.0 — Windows .exe</div>
+      <div class="dl-meta">Windows 10/11 · 64-bit · ~120MB · Free to download · License key required to activate</div>
+    </div>
+    <a class="dl-btn" href="https://drive.google.com/uc?export=download&id=1sCb0_Z-jUw2ccXOgy5oySD-mPLmZJCxr">⬇️ Download</a>
+  </div>
+
+  <div class="hero-terminal" style="margin-top:32px">
+    <div class="term-bar">
+      <div class="td td1"></div><div class="td td2"></div><div class="td td3"></div>
+      <span class="term-title">scriptforge-ai — terminal</span>
+      <span class="term-ai">● AI READY</span>
+    </div>
+    <div class="term-body">
+      <div><span class="tc">~/dev</span> <span class="tp">$</span> scriptforge --tool script-gen</div>
+      <div><span class="ty">▶</span> <span class="tw">Loading ScriptForge AI v2.0...</span></div>
+      <div><span class="tg">✓</span> <span class="tw">AI Models: Claude · GPT-4o · Gemini</span></div>
+      <div><span class="tg">✓</span> <span class="tw">License: Full Stack Bundle — Active</span></div>
+      <div><span class="tp">$</span> <span class="typing"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat-item"><div class="stat-num">6+</div><div class="stat-lbl">AI Tools</div></div>
+  <div class="stat-item"><div class="stat-num">3</div><div class="stat-lbl">AI Models</div></div>
+  <div class="stat-item"><div class="stat-num">100/day</div><div class="stat-lbl">Max Requests</div></div>
+  <div class="stat-item"><div class="stat-num">♾️</div><div class="stat-lbl">Lifetime Plans</div></div>
+</div>
+
+<!-- TOOLS -->
+<section class="tools-section reveal" id="tools">
+  <div class="section-label">// what you get</div>
+  <div class="section-title">6 AI-Powered Tools</div>
+  <div class="section-sub">Everything a FiveM & Discord developer needs — in one app.</div>
+  <div class="tools-grid">
+    <div class="tool-card featured"><span class="tool-icon">⚡</span><div class="tool-name">Script Generator</div><div class="tool-desc">Generate production-ready FiveM & Discord scripts. QBcore, ESX, Standalone, ox_core, vRP. Outputs server.lua, client.lua, fxmanifest.lua, config.lua — ready to drop in resources.</div><span class="tool-tag hot">Most Used</span></div>
+    <div class="tool-card"><span class="tool-icon">🔍</span><div class="tool-name">Script Analyzer</div><div class="tool-desc">Detect bugs, memory leaks, infinite loops, and performance issues. Get AI-powered fix suggestions instantly.</div><span class="tool-tag">Analyzer</span></div>
+    <div class="tool-card"><span class="tool-icon">🛡️</span><div class="tool-name">Exploit Scanner</div><div class="tool-desc">Detect backdoors, token stealers, money dupes, crypto miners, and RATs hidden inside scripts.</div><span class="tool-tag hot">Security</span></div>
+    <div class="tool-card"><span class="tool-icon">🔄</span><div class="tool-name">Framework Converter</div><div class="tool-desc">Auto-convert scripts between ESX and QBcore. Handles exports, functions, and variable names.</div><span class="tool-tag new">New</span></div>
+    <div class="tool-card"><span class="tool-icon">🤖</span><div class="tool-name">Discord Bot Generator</div><div class="tool-desc">Generate full Discord bots with ticket systems, moderation, economy, and anti-raid with toggle on/off.</div><span class="tool-tag pro">Pro</span></div>
+    <div class="tool-card"><span class="tool-icon">📊</span><div class="tool-name">Server Doctor</div><div class="tool-desc">Detect lag sources, dump files, security risks, and misconfigurations. Shows warnings before deleting anything.</div><span class="tool-tag new">New</span></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section reveal" id="how">
+  <div class="section-label">// getting started</div>
+  <div class="section-title">Up in 60 seconds</div>
+  <div class="steps-grid">
+    <div class="step"><div class="step-num">1</div><div class="step-title">Login with Discord</div><div class="step-desc">Click "Login with Discord" — required to purchase or access your dashboard.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-title">Pick a Plan</div><div class="step-desc">Monthly or Lifetime. Pay via CashApp → key sent to email instantly.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-title">Download .exe</div><div class="step-desc">Windows app. Open, enter your license key, and you're in.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-title">Build Faster</div><div class="step-desc">Generate, analyze, convert, and deploy — all from one AI-powered desktop app.</div></div>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section class="plans-section reveal" id="plans">
+  <div class="section-label">// pricing</div>
+  <div class="section-title">Plans & Pricing</div>
+  <div class="section-sub">Monthly subscriptions or pay once and own it forever with Lifetime plans.</div>
+  <div class="plans-toggle">
+    <button class="active" onclick="showPlans('monthly')">Monthly</button>
+    <button onclick="showPlans('lifetime')">♾️ Lifetime</button>
+  </div>
+  <div id="plansMonthly">
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-type">FiveM Developer</div><div class="plan-name">FiveM Dev Pro</div>
+        <div class="plan-price paid">$10<span>/mo</span></div>
+        <div class="plan-tagline">Everything a FiveM dev needs.</div>
+        <ul class="plan-features">
+          <li class="yes">Script Generator (QBcore · ESX · Standalone)</li><li class="yes">Script Analyzer</li><li class="yes">Exploit Scanner</li><li class="yes">Framework Converter</li><li class="yes">Server Doctor</li><li class="yes">50 AI requests / day</li><li class="yes">Multi-language support</li><li class="no">Discord Bot Generator</li>
+        </ul>
+        <button class="plan-btn paid-btn" onclick="requireDiscordToBuy('FiveM Dev Pro','$10/mo')">Get Started →</button>
+      </div>
+      <div class="plan-card hot">
+        <div class="plan-type">Full Stack</div><div class="plan-name">Full Stack Bundle</div>
+        <div class="plan-price paid">$15<span>/mo</span></div>
+        <div class="plan-tagline">All tools. Maximum power.</div>
+        <ul class="plan-features">
+          <li class="yes">ALL FiveM tools</li><li class="yes">Discord Bot Generator</li><li class="yes">Exploit Scanner</li><li class="yes">Server Doctor + Dump Detector</li><li class="yes">100 AI requests / day</li><li class="yes">Priority support</li><li class="yes">Multi-language support</li><li class="yes">All future tools included</li>
+        </ul>
+        <button class="plan-btn paid-btn" onclick="requireDiscordToBuy('Full Stack Bundle','$15/mo')">Get Started →</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-type">Discord Developer</div><div class="plan-name">Discord Dev Pro</div>
+        <div class="plan-price devpro">$8<span>/mo</span></div>
+        <div class="plan-tagline">Build powerful Discord bots fast.</div>
+        <ul class="plan-features">
+          <li class="yes">Discord Bot Generator</li><li class="yes">Script Analyzer</li><li class="yes">Exploit Scanner</li><li class="yes">Anti-Raid (toggle on/off)</li><li class="yes">50 AI requests / day</li><li class="yes">Multi-language support</li><li class="no">FiveM Script Generator</li><li class="no">Framework Converter</li>
+        </ul>
+        <button class="plan-btn devpro-btn" onclick="requireDiscordToBuy('Discord Dev Pro','$8/mo')">Get Started →</button>
+      </div>
+    </div>
+  </div>
+  <div id="plansLifetime" style="display:none">
+    <div class="plans-grid-lifetime">
+      <div class="plan-card lifetime">
+        <div class="plan-type">FiveM — One Time</div><div class="plan-name">FiveM Lifetime</div>
+        <div class="plan-price gold">$49<span> one-time</span></div>
+        <div class="plan-tagline">Pay once. Use forever. No renewals.</div>
+        <ul class="plan-features">
+          <li class="yes">All FiveM tools — forever</li><li class="yes">Script Generator · Analyzer · Scanner</li><li class="yes">Framework Converter · Server Doctor</li><li class="yes">50 AI requests / day</li><li class="yes">All future FiveM updates</li><li class="yes">Multi-language support</li><li class="no">Discord Bot Generator</li>
+        </ul>
+        <button class="plan-btn gold-btn" onclick="requireDiscordToBuy('FiveM Lifetime','$49 one-time')">Buy Lifetime →</button>
+      </div>
+      <div class="plan-card ultimate">
+        <div class="plan-type">Ultimate — One Time</div><div class="plan-name">Ultimate Lifetime</div>
+        <div class="plan-price gold">$89<span> one-time</span></div>
+        <div class="plan-tagline">Every tool. Unlimited forever. Best value.</div>
+        <ul class="plan-features">
+          <li class="yes">ALL tools — every single one</li><li class="yes">Unlimited AI requests / day</li><li class="yes">Priority support forever</li><li class="yes">All future tools + addons</li><li class="yes">3D Assets Addon (when released)</li><li class="yes">Media Addon (when released)</li><li class="yes">Multi-language support</li>
+        </ul>
+        <button class="plan-btn ultimate-btn" onclick="requireDiscordToBuy('Ultimate Lifetime','$89 one-time')">Buy Ultimate →</button>
+      </div>
+      <div class="plan-card lifetime">
+        <div class="plan-type">Discord — One Time</div><div class="plan-name">Discord Lifetime</div>
+        <div class="plan-price gold">$39<span> one-time</span></div>
+        <div class="plan-tagline">Discord dev tools. Forever yours.</div>
+        <ul class="plan-features">
+          <li class="yes">Discord Bot Generator — forever</li><li class="yes">Analyzer · Exploit Scanner</li><li class="yes">Anti-Raid toggle</li><li class="yes">50 AI requests / day</li><li class="yes">All future Discord updates</li><li class="yes">Multi-language support</li><li class="no">FiveM tools</li>
+        </ul>
+        <button class="plan-btn gold-btn" onclick="requireDiscordToBuy('Discord Lifetime','$39 one-time')">Buy Lifetime →</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--text3)">💎 Add-ons coming soon: 3D/Assets Addon · Media Addon (logos, videos, backgrounds)</div>
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<section class="dashboard-section reveal" id="dashboard">
+  <div class="dashboard-inner">
+    <div class="section-label">// your account</div>
+    <div class="section-title">Your Dashboard</div>
+    <div class="section-sub">See your active plan, usage, subscription dates, and manage your account.</div>
+    <div class="dashboard-preview">
+      <div class="dash-topbar">
+        <div class="dash-dots"><div class="dash-dot" style="background:#ff5f57"></div><div class="dash-dot" style="background:#febc2e"></div><div class="dash-dot" style="background:#28c840"></div></div>
+        <div class="dash-url">scriptforge-ai-mocha.vercel.app/dashboard</div>
+      </div>
+      <div class="dash-content">
+        <div class="dash-discord-lock" id="dashLocked">
+          <div class="dash-lock-icon">🔐</div>
+          <div class="dash-lock-title">Login Required</div>
+          <div class="dash-lock-sub">Sign in with your Discord account to view your subscription, usage, and manage your plan.</div>
+          <button class="btn-discord-lg" onclick="loginWithDiscord()" style="margin-top:8px">
+            <svg width="18" height="14" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a41 41 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.3 0A38.3 38.3 0 0 0 25.5.4 58.4 58.4 0 0 0 10.8 5C1.6 18.5-.9 31.7.3 44.7a58.9 58.9 0 0 0 18 9.1 44.5 44.5 0 0 0 3.8-6.2l-.1-.1a38.8 38.8 0 0 1-6-2.9l1-.7c11.5 5.3 24 5.3 35.3 0l1 .7a38.8 38.8 0 0 1-6 2.9c1.1 2.2 2.4 4.3 3.8 6.2a58.8 58.8 0 0 0 18-9.1C71 29.7 67.3 16.6 60.1 4.9ZM23.7 36.9c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/></svg>
+            Login with Discord
+          </button>
+        </div>
+        <div id="dashUnlocked" style="display:none">
+          <div class="dash-header">
+            <div><div class="dash-welcome">Welcome back, <span id="dashName">User</span> 👋</div><div class="dash-welcome-sub">Here's your account overview</div></div>
+            <a class="dl-btn" href="https://drive.google.com/uc?export=download&id=1sCb0_Z-jUw2ccXOgy5oySD-mPLmZJCxr">⬇️ Download App</a>
+          </div>
+          <div class="dash-cards">
+            <div class="dash-card"><div class="dash-card-label">Active Plan</div><div class="dash-card-val" id="dashPlanVal">—</div><div class="dash-card-sub">Current subscription</div></div>
+            <div class="dash-card"><div class="dash-card-label">AI Requests Today</div><div class="dash-card-val" id="dashUsageVal">0/50</div><div class="dash-card-sub">Resets at midnight</div></div>
+            <div class="dash-card"><div class="dash-card-label">Next Payment</div><div class="dash-card-val" id="dashNextPayVal">—</div><div class="dash-card-sub" id="dashNextPaySub">—</div></div>
+            <div class="dash-card"><div class="dash-card-label">Status</div><div class="dash-card-val" style="color:var(--green)" id="dashStatusVal">ACTIVE</div><div class="dash-card-sub">License valid</div></div>
+          </div>
+          <div class="dash-plan-block">
+            <div class="dash-plan-info">
+              <div class="dash-plan-name" id="dashPlanName">—</div>
+              <div class="dash-plan-meta" id="dashPlanMeta">—</div>
+            </div>
+            <div class="dash-plan-bar">
+              <div class="dash-bar-label"><span>Daily Usage</span><span id="dashBarPct">0%</span></div>
+              <div class="dash-bar-track"><div class="dash-bar-fill" id="dashBarFill" style="width:0%"></div></div>
+            </div>
+            <div class="dash-plan-btns">
+              <button class="dash-btn-cancel" onclick="confirmCancel()">Cancel Plan</button>
+              <button class="dash-btn-renew" onclick="scrollToPlans()">Renew / Upgrade</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAYMENT -->
+<div class="payment-section reveal">
+  <div class="section-label" style="text-align:center">// how to pay</div>
+  <div class="section-title" style="text-align:center">Simple Payment</div>
+  <div style="font-size:13px;color:var(--text2);text-align:center;margin-top:8px">Pay → Screenshot → Key sent to email in ~30 seconds</div>
+  <div class="payment-methods">
+    <div class="cashapp-highlight" onclick="payWithCashApp()">
+      <span style="font-size:24px">💵</span>
+      <div><div>$IsanderMelendezOrtiz</div><div style="font-size:10px;opacity:.7;font-weight:400">CashApp · Fastest</div></div>
+    </div>
+    <div class="pay-card"><span>💳</span> Card — Contact Discord</div>
+    <div class="pay-card"><span>🎮</span> Discord: <a href="https://discord.gg/xWARANHmZk" target="_blank" style="color:var(--cyan);text-decoration:none;margin-left:4px">Join Server</a></div>
+  </div>
+</div>
+
+<!-- AI MODELS -->
+<section class="ai-section reveal">
+  <div class="section-label">// powered by</div>
+  <div class="section-title">3 AI Engines</div>
+  <div class="section-sub">Switch between models for each task. Best-in-class AI for every job.</div>
+  <div class="ai-grid">
+    <div class="ai-card"><span class="ai-rank rank-1">⭐ #1</span><div class="ai-logo">🤖</div><div class="ai-name">Claude Sonnet 4</div><div class="ai-tag">by Anthropic</div><div class="ai-desc">Best for complex script generation. Follows FiveM patterns perfectly. Deep code understanding.</div></div>
+    <div class="ai-card"><span class="ai-rank rank-2">#2</span><div class="ai-logo">⚡</div><div class="ai-name">GPT-4o</div><div class="ai-tag">by OpenAI</div><div class="ai-desc">Fastest responses. Great for quick analysis, framework conversion and Discord bot generation.</div></div>
+    <div class="ai-card"><span class="ai-rank rank-3">#3</span><div class="ai-logo">🌟</div><div class="ai-name">Gemini 1.5 Pro</div><div class="ai-tag">by Google</div><div class="ai-desc">Excellent for exploit scanning and security analysis. Handles large files with ease.</div></div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="security-section reveal" id="security">
+  <div class="section-label">// trust & safety</div>
+  <div class="section-title">Built Secure</div>
+  <div class="section-sub">Your license key is unique, one-time-use, and tied to your account.</div>
+  <div class="security-grid">
+    <div class="sec-card"><div class="sec-icon">🔑</div><div class="sec-title">Unique License Keys</div><div class="sec-desc">Every key is cryptographically unique. No two keys are ever the same.</div></div>
+    <div class="sec-card"><div class="sec-icon">🎮</div><div class="sec-title">Discord Login Required</div><div class="sec-desc">All purchases and dashboard access require Discord authentication. No anonymous accounts.</div></div>
+    <div class="sec-card"><div class="sec-icon">🛡️</div><div class="sec-title">Exploit Protection</div><div class="sec-desc">The app itself scans for exploits before generating code. Everything output is safe and production-ready.</div></div>
+    <div class="sec-card"><div class="sec-icon">🔒</div><div class="sec-title">Encrypted Storage</div><div class="sec-desc">License data stored securely in Supabase. Staff can look up, cancel, or revoke keys instantly.</div></div>
+    <div class="sec-card"><div class="sec-icon">⚠️</div><div class="sec-title">Safe Server Doctor</div><div class="sec-desc">Dangerous files are never deleted automatically. You always get a warning and choose to keep or delete.</div></div>
+    <div class="sec-card"><div class="sec-icon">📋</div><div class="sec-title">Full Audit Logs</div><div class="sec-desc">Every login and key action is logged to the founder dashboard with Discord ID and timestamp.</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section reveal">
+  <h2>Start Building <span>Smarter</span></h2>
+  <p class="cta-sub">Join developers already using ScriptForge AI to build FiveM resources and Discord bots 10x faster.</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+    <button class="btn-discord-lg" onclick="loginWithDiscord()">
+      <svg width="20" height="16" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a41 41 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.3 0A38.3 38.3 0 0 0 25.5.4 58.4 58.4 0 0 0 10.8 5C1.6 18.5-.9 31.7.3 44.7a58.9 58.9 0 0 0 18 9.1 44.5 44.5 0 0 0 3.8-6.2l-.1-.1a38.8 38.8 0 0 1-6-2.9l1-.7c11.5 5.3 24 5.3 35.3 0l1 .7a38.8 38.8 0 0 1-6 2.9c1.1 2.2 2.4 4.3 3.8 6.2a58.8 58.8 0 0 0 18-9.1C71 29.7 67.3 16.6 60.1 4.9ZM23.7 36.9c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/></svg>
+      Login with Discord
+    </button>
+    <a class="btn-download-lg" href="https://drive.google.com/uc?export=download&id=1sCb0_Z-jUw2ccXOgy5oySD-mPLmZJCxr">⬇️ Download Free</a>
+    <a class="btn-ghost-lg" href="https://discord.gg/xWARANHmZk" target="_blank">🎮 Join Discord</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <img src="https://cdn.discordapp.com/attachments/1432861226232447016/1480394204457734144/Gemini_Generated_Image_5ipt7a5ipt7a5ipt-removebg-preview.png?ex=69af840a&is=69ae328a&hm=4bdddd9f1db051af2696e0cfd7faa145d74af571ed0f9edd413228eb21126849&" alt="">
+    <div class="footer-logo">Script<span>Forge</span> AI</div>
+  </div>
+  <div class="footer-links">
+    <a href="#tools">Tools</a><a href="#plans">Pricing</a><a href="#dashboard">Dashboard</a><a href="#security">Security</a>
+    <a href="mailto:rageisander@gmail.com">Support</a>
+    <a href="https://discord.gg/xWARANHmZk" target="_blank">Discord</a>
+    <a href="https://drive.google.com/uc?export=download&id=1sCb0_Z-jUw2ccXOgy5oySD-mPLmZJCxr">⬇️ Download</a>
+  </div>
+  <div class="footer-copy">© 2026 ScriptForge AI · Made by Burlau Devs</div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authModal')">×</button>
+    <div class="modal-logo">
+      <img src="https://cdn.discordapp.com/attachments/1432861226232447016/1480394204457734144/Gemini_Generated_Image_5ipt7a5ipt7a5ipt-removebg-preview.png?ex=69af840a&is=69ae328a&hm=4bdddd9f1db051af2696e0cfd7faa145d74af571ed0f9edd413228eb21126849&" alt="">
+    </div>
+    <div class="modal-title">Sign in to ScriptForge AI</div>
+    <div class="modal-sub">Discord login required to purchase plans and access your dashboard.</div>
+    <button class="discord-login-btn" onclick="doDiscordLogin()">
+      <svg width="20" height="16" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a41 41 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.3 0A38.3 38.3 0 0 0 25.5.4 58.4 58.4 0 0 0 10.8 5C1.6 18.5-.9 31.7.3 44.7a58.9 58.9 0 0 0 18 9.1 44.5 44.5 0 0 0 3.8-6.2l-.1-.1a38.8 38.8 0 0 1-6-2.9l1-.7c11.5 5.3 24 5.3 35.3 0l1 .7a38.8 38.8 0 0 1-6 2.9c1.1 2.2 2.4 4.3 3.8 6.2a58.8 58.8 0 0 0 18-9.1C71 29.7 67.3 16.6 60.1 4.9ZM23.7 36.9c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/></svg>
+      Continue with Discord
+    </button>
+    <div class="discord-required-note">🔐 We only request your username and avatar. No permissions to your server or messages.</div>
+  </div>
+</div>
+
+<!-- PAY MODAL -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('payModal')">×</button>
+    <div class="modal-title">💎 Get Your Plan</div>
+    <div class="modal-sub" id="payModalSub">Select payment method</div>
+    <button class="cashapp-pay-block" onclick="payWithCashApp()">
+      <span style="font-size:28px">💵</span>
+      <div><div class="cashapp-tag-display">$IsanderMelendezOrtiz</div><div class="cashapp-note">CashApp · Key delivered in ~30 seconds</div></div>
+      <span style="margin-left:auto;color:#00C85B;font-size:14px;font-weight:900">→</span>
+    </button>
+    <div class="warning-note">⚠ Write <strong>"Gift"</strong> in the CashApp note. Required — no exceptions.</div>
+    <button class="pay-option" onclick="showToast('Contact us on Discord for card payments!')">
+      <span style="font-size:20px">💳</span>
+      <div><div style="font-weight:700;color:var(--text)">Pay with Card</div><div style="font-size:10px;color:var(--text3)">Contact via Discord</div></div>
+    </button>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.7">🔐 License key sent to email after verification · All sales final</div>
+  </div>
+</div>
+
+<!-- SUBSCRIPTION MODAL -->
+<div class="modal-overlay" id="subModal">
+  <div class="modal" style="width:520px">
+    <button class="modal-close" onclick="closeModal('subModal')">×</button>
+    <div class="modal-title">📊 My Subscription</div>
+    <div class="modal-sub" id="subModalUser">Logged in as —</div>
+    <div id="subHasPlan">
+      <div class="sub-detail"><span class="sub-detail-label">Plan</span><span class="sub-detail-value" id="subPlan">—</span></div>
+      <div class="sub-detail"><span class="sub-detail-label">Status</span><span class="sub-detail-value active" id="subStatus">ACTIVE</span></div>
+      <div class="sub-detail"><span class="sub-detail-label">License Key</span><span class="sub-detail-value" id="subKey" style="font-size:10px;color:var(--text3)">—</span></div>
+      <div class="sub-detail"><span class="sub-detail-label">Expiry / Renewal</span><span class="sub-detail-value warning" id="subExpiry">—</span></div>
+      <div class="sub-detail"><span class="sub-detail-label">Login Count</span><span class="sub-detail-value" id="subLoginCount">—</span></div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="dash-btn-cancel" style="flex:1" onclick="confirmCancel()">🚫 Cancel Plan</button>
+        <button class="dash-btn-renew" style="flex:1" onclick="scrollToPlans()">🔄 Renew / Upgrade</button>
+      </div>
+    </div>
+    <div id="subNoPlan" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:40px;margin-bottom:12px">🔑</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:900;margin-bottom:8px">No Active Plan</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:20px">Purchase a plan to unlock ScriptForge AI tools.</div>
+      <button class="plan-btn paid-btn" onclick="closeModal('subModal');scrollToPlans()">View Plans →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT FAB -->
+<div class="support-fab">
+  <div class="support-menu" id="supportMenu">
+    <div class="support-option" onclick="window.location='mailto:rageisander@gmail.com'">📧 Email Support</div>
+    <div class="support-option" onclick="window.open('https://discord.gg/xWARANHmZk','_blank')">🎮 Discord Support</div>
+  </div>
+  <button class="support-main" onclick="toggleSupport()">💬 Support</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────
+let currentUser = null;
+let selectedPlan = '';
+let pendingPlan = null;
+
+// ── SESSION (real OAuth via /api/auth/me) ──────────────────
+async function loadSession() {
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.user) {
+        currentUser = data.user;
+        updateUIForUser();
+      }
+    }
+  } catch(e) {
+    console.warn('Session load failed:', e);
+  }
+
+  // Handle redirect params
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('login') === 'success') {
+    showToast('✅ Logged in with Discord!');
+    history.replaceState({}, '', '/');
+    if (pendingPlan) {
+      setTimeout(() => openPayModal(pendingPlan.name, pendingPlan.price), 800);
+      pendingPlan = null;
+    }
+  }
+  if (params.get('error')) {
+    const errMap = {
+      discord_denied: 'Login cancelled.',
+      token_exchange: 'Discord auth failed. Try again.',
+      server_error: 'Server error. Try again.',
+    };
+    showToast('❌ ' + (errMap[params.get('error')] || 'Login failed.'));
+    history.replaceState({}, '', '/');
+  }
+}
+
+function doDiscordLogin() {
+  closeModal('authModal');
+  // Save pending plan to sessionStorage before redirect
+  if (pendingPlan) sessionStorage.setItem('pendingPlan', JSON.stringify(pendingPlan));
+  document.getElementById('loadingOverlay').classList.add('show');
+  setTimeout(() => { window.location.href = '/api/auth/discord'; }, 400);
+}
+
+function updateUIForUser() {
+  if (!currentUser) return;
+
+  // Nav
+  document.getElementById('navGuest').style.display = 'none';
+  document.getElementById('navUser').classList.add('active');
+  document.getElementById('navAvatar').src = currentUser.avatar || '';
+  document.getElementById('navUsername').textContent = currentUser.global_name || currentUser.username;
+  document.getElementById('navPlanBadge').textContent = currentUser.plan || 'No Plan';
+
+  // Hero
+  document.getElementById('heroBtnsGuest').style.display = 'none';
+  document.getElementById('heroBtnsUser').style.display = 'flex';
+  document.getElementById('heroDiscordNotice').style.display = 'none';
+
+  // Dashboard
+  document.getElementById('dashLocked').style.display = 'none';
+  document.getElementById('dashUnlocked').style.display = 'block';
+  document.getElementById('dashName').textContent = currentUser.global_name || currentUser.username;
+  updateDashboard();
+}
+
+function updateDashboard() {
+  if (!currentUser) return;
+  const plan = currentUser.plan || 'No Plan';
+  const usage = currentUser.usage || 0;
+  const limit = currentUser.limit || 50;
+  const pct = limit > 0 ? Math.round((usage / limit) * 100) : 0;
+
+  document.getElementById('dashPlanVal').textContent = plan;
+  document.getElementById('dashUsageVal').textContent = `${usage}/${limit === 99999 ? '∞' : limit}`;
+  document.getElementById('dashBarFill').style.width = pct + '%';
+  document.getElementById('dashBarPct').textContent = pct + '%';
+  document.getElementById('dashPlanName').textContent = plan;
+
+  if (currentUser.expires) {
+    const exp = new Date(currentUser.expires);
+    const days = Math.ceil((exp - Date.now()) / 86400000);
+    document.getElementById('dashNextPayVal').textContent = exp.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    document.getElementById('dashNextPaySub').textContent = `${days} day${days !== 1 ? 's' : ''} remaining`;
+    document.getElementById('dashPlanMeta').textContent = days > 0 ? `Renews in ${days} days` : '⚠️ Expired';
+    const statusEl = document.getElementById('dashStatusVal');
+    statusEl.textContent = days > 0 ? 'ACTIVE' : 'EXPIRED';
+    statusEl.style.color = days > 0 ? 'var(--green)' : 'var(--red)';
+  } else if (plan.toLowerCase().includes('lifetime')) {
+    document.getElementById('dashNextPayVal').textContent = '♾️ Never';
+    document.getElementById('dashNextPaySub').textContent = 'Lifetime access';
+    document.getElementById('dashPlanMeta').textContent = 'Lifetime — no renewal needed';
+  } else {
+    document.getElementById('dashNextPayVal').textContent = '—';
+    document.getElementById('dashNextPaySub').textContent = 'No active plan';
+    document.getElementById('dashPlanMeta').textContent = 'No plan active';
+  }
+}
+
+function doLogout() {
+  window.location.href = '/api/auth/logout';
+}
+
+// ── PLAN PURCHASE ──────────────────────────────────────────
+function loginWithDiscord() {
+  if (currentUser) return;
+  openModal('authModal');
+}
+
+function requireDiscordToBuy(name, price) {
+  if (!currentUser) {
+    pendingPlan = { name, price };
+    openModal('authModal');
+    return;
+  }
+  openPayModal(name, price);
+}
+
+function openPayModal(name, price) {
+  selectedPlan = name;
+  document.getElementById('payModalSub').textContent = `${name} — ${price}`;
+  openModal('payModal');
+}
+
+function payWithCashApp() {
+  closeModal('payModal');
+  window.open('https://cash.app/$IsanderMelendezOrtiz', '_blank');
+  showToast('✅ After paying, send screenshot to Discord for your key!');
+}
+
+function scrollToPlans() {
+  closeModal('subModal');
+  document.getElementById('plans').scrollIntoView({ behavior: 'smooth' });
+}
+
+function confirmCancel() {
+  if (confirm('Are you sure? You will lose access when your plan expires.')) {
+    showToast('Contact support on Discord to cancel.');
+    closeModal('subModal');
+    window.open('https://discord.gg/xWARANHmZk', '_blank');
+  }
+}
+
+// ── SUBSCRIPTION MODAL ─────────────────────────────────────
+function openSubModal() {
+  if (!currentUser) { openModal('authModal'); return; }
+
+  document.getElementById('subModalUser').textContent =
+    `Logged in as ${currentUser.global_name || currentUser.username} · #${currentUser.id}`;
+
+  if (currentUser.plan) {
+    document.getElementById('subHasPlan').style.display = 'block';
+    document.getElementById('subNoPlan').style.display = 'none';
+    document.getElementById('subPlan').textContent = currentUser.plan;
+    document.getElementById('subKey').textContent = currentUser.key || 'Key on file';
+    document.getElementById('subLoginCount').textContent = `${currentUser.login_count || 1} times`;
+
+    if (currentUser.expires) {
+      document.getElementById('subExpiry').textContent =
+        new Date(currentUser.expires).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    } else if (currentUser.plan.toLowerCase().includes('lifetime')) {
+      document.getElementById('subExpiry').textContent = '♾️ Never — Lifetime';
+      document.getElementById('subExpiry').style.color = 'var(--green)';
+    }
+  } else {
+    document.getElementById('subHasPlan').style.display = 'none';
+    document.getElementById('subNoPlan').style.display = 'block';
+  }
+  openModal('subModal');
+}
+
+// ── PLANS TOGGLE ───────────────────────────────────────────
+function showPlans(type) {
+  const btns = document.querySelectorAll('.plans-toggle button');
+  btns.forEach(b => b.classList.remove('active'));
+  if (type === 'monthly') {
+    document.getElementById('plansMonthly').style.display = 'block';
+    document.getElementById('plansLifetime').style.display = 'none';
+    btns[0].classList.add('active');
+  } else {
+    document.getElementById('plansMonthly').style.display = 'none';
+    document.getElementById('plansLifetime').style.display = 'block';
+    btns[1].classList.add('active');
+  }
+}
+
+// ── MODALS ─────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+function toggleSupport() { document.getElementById('supportMenu').classList.toggle('open'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── SCROLL REVEAL ──────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── TERMINAL TYPING ────────────────────────────────────────
+const texts = ['analyze script.lua','generate drug_system.lua','scan exploit banking.lua','convert ESX → QBcore','create discord bot...','scan server dumps...'];
+let ti=0, ci=0, del=false;
+const el = document.querySelector('.typing');
+function typeLoop() {
+  if (!el) return;
+  const cur = texts[ti];
+  if (!del) {
+    el.textContent = cur.substring(0, ci++);
+    if (ci > cur.length) { del = true; setTimeout(typeLoop, 1500); return; }
+  } else {
+    el.textContent = cur.substring(0, ci--);
+    if (ci < 0) { del = false; ti = (ti+1) % texts.length; setTimeout(typeLoop, 400); return; }
+  }
+  setTimeout(typeLoop, del ? 40 : 80);
+}
+typeLoop();
+
+// ── INIT ───────────────────────────────────────────────────
+// Restore pending plan from sessionStorage after redirect
+const storedPlan = sessionStorage.getItem('pendingPlan');
+if (storedPlan) { try { pendingPlan = JSON.parse(storedPlan); } catch(e){} sessionStorage.removeItem('pendingPlan'); }
+
+loadSession();
+</script>
+</body>
+</html>
